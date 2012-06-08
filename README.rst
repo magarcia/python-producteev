@@ -1,7 +1,7 @@
 Producteev: Python API
 ======================
 
-This is an awesome Python wrapper for the Github API.
+This is a Python wrapper for the Producteev API.
 
 
 Installation
