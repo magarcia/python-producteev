@@ -3,12 +3,6 @@
 # This file is part of python-producteev, and is made available under
 # MIT license. See LICENSE for the full details.
 
-# TODO:
-# activities/show_activities
-# activities/show_notifications
-# activities/notifications_set_read
-# activities/set_read
-
 
 class Activity():
     """
@@ -27,8 +21,13 @@ class Activity():
         self.__raw.__dict__.update(values)
         self.id = self.__raw.id_activity
 
-    def mark_read(self):
-        return 'Not implemented yet'
+    def set_read(self):
+        """
+        Set activity status as read.
+        """
+        activities = self.__api.call('activities/set_read',
+                                     id_activity=self.id)['activities']
+        return [Activity(self.__api, x['activity']) for x in activities]
 
 
 class Activities():
@@ -40,8 +39,12 @@ class Activities():
         self.__api = api
 
     def __list():
+        """
+        Get activities. Don't return activities older than 1 month.
+        """
         def fget(self):
-            return 'Not implemented yet'
+            activities = self.__api.call('activities/show_activities')['activities']
+            return [Activity(self.__api, x['activity']) for x in activities]
 
         def fset(self):
             pass
@@ -50,8 +53,13 @@ class Activities():
     list = property(**__list())
 
     def __notifications():
+        """
+        Get every notifications (notifications are activities that current user
+        is concerned about). Don't return notifications older than 1 month.
+        """
         def fget(self):
-            return 'Not implemented yet'
+            activities = self.__api.call('activities/show_notifications')['activities']
+            return [Activity(self.__api, x['activity']) for x in activities]
 
         def fset(self):
             pass
@@ -59,5 +67,38 @@ class Activities():
         return locals()
     notifications = property(**__notifications())
 
-    def set_read(self, since):
-        return 'Not implemented yet'
+    def set_notifications_read(self, id_dashboard, last_id):
+        """
+        Set notifications status as read.
+        """
+        activities = self.__api.call('activities/notifications_set_read',
+                                     id_dashboard=id_dashboard,
+                                     last_id=last_id)['activities']
+        return [Activity(self.__api, x['activity']) for x in activities]
+
+    def set_activities_read(self, activities_list):
+        """
+        Set activities status as read.
+        """
+        if not isinstance(activities_list, list):
+            # TODO: raise error
+            return None
+
+        act_list = []
+        for act in activities_list:
+            if isinstance(act, int):
+                act_list.append(act)
+            elif isinstance(act, Activity):
+                act_list.append(act.id)
+            elif isinstance(act, str):
+                try:
+                    act = int(act)
+                    act_list.append(act)
+                except:
+                    pass
+            else:
+                continue
+
+        activities = self.__api.call('activities/set_read',
+                                     id_activity=act_list)['activities']
+        return [Activity(self.__api, x['activity']) for x in activities]

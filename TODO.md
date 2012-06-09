@@ -1,7 +1,5 @@
 # TODO
 
-- Finish implementation of activities
-- Finish implementation some functions of tasks
 - Finish implementation some functions of dashboars
-- Add docs
+- Improve docs
 - Add more examples

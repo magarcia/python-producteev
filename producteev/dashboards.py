@@ -5,13 +5,6 @@
 from utils import unescape
 import re
 
-# TODO:
-# dashboards/confirm
-# dashboards/refuse
-# dashboards/need_upgrade_list
-# dashboards/needs_upgrade
-# dashboards/reorder
-
 
 class Dashboard():
     """
@@ -117,6 +110,13 @@ class Dashboard():
                                         **kwargs)['dashboard']
         return Dashboard(self.__api, dashboard)
 
+    def needs_upgrade(self):
+        """
+        Get every dashboard that needs to be upgraded.
+        """
+        return self.__api.call('dashboards/needs_upgrade',
+                                     id_dashboard=self.id)
+
 
 class Dashboards():
     """
@@ -153,3 +153,81 @@ class Dashboards():
 
         return locals()
     list = property(**__list())
+
+    def confirm(self, id_dashboard):
+        """
+        Confirm invitation for a dashboard.
+        """
+        if isinstance(id_dashboard, int):
+            pass
+        elif isinstance(id_dashboard, Dashboard):
+            id_dashboard = id_dashboard.id
+        elif isinstance(id_dashboard, str):
+            try:
+                id_dashboard = int(id_dashboard)
+            except:
+                # TODO: Raise error
+                return None
+        else:
+            # TODO: Raise error
+            return None
+
+        dashboards = self.__api.call('dashboards/confirm',
+                                     id_dashboard=id_dashboard)['dashboards']
+        return [Dashboard(self.__api, x['dashboard']) for x in dashboards]
+
+    def refuse(self, id_dashboard):
+        """
+        Refuse invitation for a dashboard.
+        """
+        if isinstance(id_dashboard, int):
+            pass
+        elif isinstance(id_dashboard, Dashboard):
+            id_dashboard = id_dashboard.id
+        elif isinstance(id_dashboard, str):
+            try:
+                id_dashboard = int(id_dashboard)
+            except:
+                # TODO: Raise error
+                return None
+        else:
+            # TODO: Raise error
+            return None
+
+        dashboards = self.__api.call('dashboards/refuse',
+                                     id_dashboard=id_dashboard)
+        return dashboards
+
+    def need_upgrade(self):
+        """
+        Get every dashboard that needs to be upgraded.
+        """
+        dashboards = self.__api.call('dashboards/need_upgrade_list')['dashboards']
+        return [Dashboard(self.__api, x['dashboard']) for x in dashboards]
+
+    def reorder(self, dashboard_list):
+        """
+        Reorder dashboard position.
+        """
+        if not isinstance(dashboard_list, list):
+            # TODO: raise error
+            return None
+
+        dash_list = []
+        for dash in dashboard_list:
+            if isinstance(dash, int):
+                dash_list.append(dash)
+            elif isinstance(dash, Dashboard):
+                dash_list.append(dash.id)
+            elif isinstance(dash, str):
+                try:
+                    dash = int(dash)
+                    dash_list.append(dash)
+                except:
+                    pass
+            else:
+                continue
+
+        dashboards = self.__api.call('dashboards/reorder',
+                                     id_dashboard=dash_list)['dashboards']
+        return [Dashboard(self.__api, x['dashboard']) for x in dashboards]
