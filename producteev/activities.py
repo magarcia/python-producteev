@@ -10,7 +10,10 @@
 # activities/set_read
 
 
-class Activity(object):
+class Activity():
+    """
+    Activity represents an activity entity in Producteev.
+    """
 
     class __raw:
             pass
@@ -28,7 +31,11 @@ class Activity(object):
         return 'Not implemented yet'
 
 
-class Activities(object):
+class Activities():
+    """
+    Activities give an interface for manage activities in Producteev.
+    """
+
     def __init__(self, api):
         self.__api = api
 

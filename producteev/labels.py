@@ -2,14 +2,14 @@
 #
 # This file is part of python-producteev, and is made available under
 # MIT license. See LICENSE for the full details.
-import logging
 from utils import unescape
 
 
-LOGGER = logging.getLogger('producteev.labels')
+class Label():
+    """
+    Label represents an label entity in Producteev.
+    """
 
-
-class Label(object):
     class __raw:
             pass
 
@@ -30,7 +30,7 @@ class Label(object):
             return unescape(self.__raw.title)
 
         def fset(self, value):
-            label = self.__api.call('labels/set_title.json', id_label=self.id,
+            label = self.__api.call('labels/set_title', id_label=self.id,
                                    title=value)['label']
             self.__reload(label)
 
@@ -49,21 +49,25 @@ class Label(object):
     tasks = property(**__tasks())
 
     def delete(self):
-        return self.__api.call('labels/delete.json', id_label=self.id)
+        return self.__api.call('labels/delete', id_label=self.id)
 
 
-class Labels(object):
+class Labels():
+    """
+    Labels give an interface for manage labels in Producteev.
+    """
+
     def __init__(self, api):
         self.__api = api
 
     def new(self, title, id_dashboard):
-        return Label(self.__api, self.__api.call('labels/create.json',
+        return Label(self.__api, self.__api.call('labels/create',
                             title=title, id_dashboard=id_dashboard)['label'])
 
     def get(self, id_label):
-        return Label(self.__api, self.__api.call('labels/view.json',
+        return Label(self.__api, self.__api.call('labels/view',
                         id_label=id_label)['label'])
 
     def list(self, **kwargs):
-        lables = self.__api.call('labels/show_list.json', **kwargs)['labels']
+        lables = self.__api.call('labels/show_list', **kwargs)['labels']
         return [Label(self.__api, x['label']) for x in lables]

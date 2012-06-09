@@ -3,10 +3,7 @@
 # This file is part of python-producteev, and is made available under
 # MIT license. See LICENSE for the full details.
 from utils import unescape
-import logging
 import re
-
-LOGGER = logging.getLogger('producteev.dashboards')
 
 # TODO:
 # dashboards/confirm
@@ -16,7 +13,10 @@ LOGGER = logging.getLogger('producteev.dashboards')
 # dashboards/reorder
 
 
-class Dashboard(object):
+class Dashboard():
+    """
+    Dashboard represents an dashboard entity in Producteev.
+    """
 
     class __raw:
             pass
@@ -38,7 +38,7 @@ class Dashboard(object):
             return unescape(self.__raw.title)
 
         def fset(self, value):
-            dashboard = self.__api.call('dashboards/set_title.json',
+            dashboard = self.__api.call('dashboards/set_title',
                                         id_dashboard=self.id,
                                         title=value)['dashboard']
             self.__reload(dashboard)
@@ -49,7 +49,7 @@ class Dashboard(object):
     def __access():
         def fget(self):
             from users import User
-            users = self.__api.call('dashboards/access.json',
+            users = self.__api.call('dashboards/access',
                                     id_dashboard=self.id)['accesslist']
             return [User(self.__api, x['user']) for x in users]
 
@@ -62,7 +62,7 @@ class Dashboard(object):
     def __tasks():
         def fget(self):
             from tasks import Task
-            tasks = self.__api.call('dashboards/tasks.json',
+            tasks = self.__api.call('dashboards/tasks',
                                     id_dashboard=self.id)['tasks']
             return [Task(self.__api, x['task']) for x in tasks]
 
@@ -73,15 +73,15 @@ class Dashboard(object):
     tasks = property(**__tasks())
 
     def leave(self):
-        return self.__api.call('dashboards/leave.json', id_dashboard=self.id)
+        return self.__api.call('dashboards/leave', id_dashboard=self.id)
 
     def enable_smart_labels(self):
-        dashboard = self.__api.call('dashboards/leave.json',
+        dashboard = self.__api.call('dashboards/leave',
                                     id_dashboard=self.id, on=1)['dashboard']
         return Dashboard(self.__api, dashboard)
 
     def disable_smart_labels(self):
-        dashboard = self.__api.call('dashboards/leave.json',
+        dashboard = self.__api.call('dashboards/leave',
                                     id_dashboard=self.id, on=0)['dashboard']
         return Dashboard(self.__api, dashboard)
 
@@ -92,7 +92,7 @@ class Dashboard(object):
             self.disable_smart_labels()
 
     def delete(self):
-        return self.__api.call('dashboards/delete.json', id_dashboard=self.id)
+        return self.__api.call('dashboards/delete', id_dashboard=self.id)
 
     def invite(self, value, message=None):
         from users import User
@@ -101,40 +101,43 @@ class Dashboard(object):
             kwargs['id_user_to'] = value
             if message:
                 kwargs['message'] = message
-            dashboard = self.__api.call('dashboards/invite_user_by_id.json',
+            dashboard = self.__api.call('dashboards/invite_user_by_id',
                                         **kwargs)['dashboard']
         elif isinstance(value, int):
             kwargs['id_user_to'] = value
             if message:
                 kwargs['message'] = message
-            dashboard = self.__api.call('dashboards/invite_user_by_id.json',
+            dashboard = self.__api.call('dashboards/invite_user_by_id',
                                         **kwargs)['dashboard']
         elif re.match("^.+\\@(\\[?)[a-zA-Z0-9\\-\\.]+\\.([a-zA-Z]{2,3}|[0-9]{1,3})(\\]?)$", value) != None:
             kwargs['email'] = value
             if message:
                 kwargs['message'] = message
-            dashboard = self.__api.call('dashboards/invite_user_by_id.json',
+            dashboard = self.__api.call('dashboards/invite_user_by_id',
                                         **kwargs)['dashboard']
         return Dashboard(self.__api, dashboard)
 
 
-class Dashboards(object):
+class Dashboards():
+    """
+    Dashboards give an interface for manage dashboards in Producteev.
+    """
 
     def __init__(self, api):
         self.__api = api
 
     def new(self, title):
-        return Dashboard(self.__api, self.__api.call('dashboards/create.json',
+        return Dashboard(self.__api, self.__api.call('dashboards/create',
                                 title=title)['dashboard'])
 
     def get(self, value):
         if isinstance(value, int):
             dashboard = Dashboard(self.__api,
-                                self.__api.call('dashboards/view.json',
+                                self.__api.call('dashboards/view',
                                 id_dashboard=value)['dashboard'])
         elif isinstance(value, Dashboard):
             dashboard = Dashboard(self.__api,
-                                self.__api.call('dashboards/view.json',
+                                self.__api.call('dashboards/view',
                                 id_dashboard=value.id)['dashboard'])
         else:
             dashboard = None
@@ -142,7 +145,7 @@ class Dashboards(object):
 
     def __list():
         def fget(self):
-            dashboards = self.__api.call('dashboards/show_list.json')['dashboards']
+            dashboards = self.__api.call('dashboards/show_list')['dashboards']
             return [Dashboard(self.__api, x['dashboard']) for x in dashboards]
 
         def fset(self):

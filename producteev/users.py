@@ -5,16 +5,17 @@
 # This file is part of python-producteev, and is made available under
 # MIT license. See LICENSE for the full details.
 from utils import unescape
-import logging
-
-LOGGER = logging.getLogger('producteev.users')
 
 LANG_ID = ('English', 'Français', 'Italiano', 'Deutsch')
 SORT_BY = ('deadline', 'manager', 'labels', 'time_lastchange',
            'workspace', 'priority', 'title', 'time_created')
 
 
-class User(object):
+class User():
+    """
+    User represents an user entity in Producteev.
+    """
+
     class __raw:
             pass
 
@@ -24,10 +25,10 @@ class User(object):
 
     def __get_user_info(self, id):
         if isinstance(id, int):
-            self.__raw.__dict__.update(self.__api.call('users/view.json',
+            self.__raw.__dict__.update(self.__api.call('users/view',
                                 id_colleague=id)['user'])
         else:
-            self.__raw.__dict__.update(self.__api.call('users/view.json')['user'])
+            self.__raw.__dict__.update(self.__api.call('users/view')['user'])
         self.firstname = unescape(self.__raw.firstname)
         self.lastname = unescape(self.__raw.lastname)
         self.company = unescape(self.__raw.company)
@@ -59,10 +60,10 @@ class User(object):
             from dashboards import Dashboard
 
             if isinstance(value, int):
-                user = self.__api.call('users/set_default_dashboard.json',
+                user = self.__api.call('users/set_default_dashboard',
                                         id_dashboard=value)['user']
             elif isinstance(value, Dashboard):
-                user = self.__api.call('users/set_default_dashboard.json',
+                user = self.__api.call('users/set_default_dashboard',
                                         id_dashboard=value.id)['user']
             else:
                 user = None
@@ -79,17 +80,17 @@ class User(object):
 
         def fset(self, value):
             if isinstance(value, int):
-                user = self.__api.call('users/set_sort_by.json',
+                user = self.__api.call('users/set_sort_by',
                                        sort=value)['user']
             elif isinstance(value, str):
                 try:
                     value = int(value)
-                    user = self.__api.call('users/set_sort_by.json',
+                    user = self.__api.call('users/set_sort_by',
                                        sort=value)['user']
                 except:
                     try:
                         value = SORT_BY.index(value.lower()) + 1
-                        user = self.__api.call('users/set_sort_by.json',
+                        user = self.__api.call('users/set_sort_by',
                                        sort=value)['user']
                     except:
                         user = None
@@ -107,7 +108,7 @@ class User(object):
             return self.__raw.timezone
 
         def fset(self, value):
-            user = self.__api.call('users/set_timezone.json',
+            user = self.__api.call('users/set_timezone',
                                    timezone=value)['user']
             self.__reload(user)
 
@@ -115,8 +116,9 @@ class User(object):
     timezone = property(**__timezone())
 
 
-class Users(object):
+class Users():
     """
+    Users give an interface for manage users in Producteev.
     """
 
     def __init__(self, api):

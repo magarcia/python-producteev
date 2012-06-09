@@ -3,13 +3,12 @@
 # This file is part of python-producteev, and is made available under
 # MIT license. See LICENSE for the full details.
 from utils import unescape
-import logging
 
 
-LOGGER = logging.getLogger('producteev.subtasks')
-
-
-class Subtask(object):
+class Subtask():
+    """
+    Subtask represents an subtask entity in Producteev.
+    """
 
     class __raw:
             pass
@@ -18,7 +17,6 @@ class Subtask(object):
         self.__api = api
         self.__raw.__dict__.update(values)
         self.id = self.__raw.id_subtask
-        LOGGER.debug(self.__raw.__dict__)
 
     def __reload(self, values):
         self.__raw.__dict__.update(values)
@@ -32,7 +30,7 @@ class Subtask(object):
             return unescape(self.__raw.title)
 
         def fset(self, value):
-            subtask = self.__api.call('subtasks/set_title.json', id_subtask=self.id,
+            subtask = self.__api.call('subtasks/set_title', id_subtask=self.id,
                                    title=value)['subtask']
             self.__reload(subtask)
 
@@ -44,7 +42,7 @@ class Subtask(object):
             return self.__raw.position
 
         def fset(self, value):
-            subtask = self.__api.call('subtasks/set_position.json',
+            subtask = self.__api.call('subtasks/set_position',
                                       id_subtask=self.id)['subtask']
             self.__reload(subtask)
 
@@ -52,20 +50,24 @@ class Subtask(object):
     position = property(**__position())
 
     def delete(self):
-        return self.__api.call('subtasks/delete.json', id_subtask=self.id)
+        return self.__api.call('subtasks/delete', id_subtask=self.id)
 
 
-class Subtasks(object):
+class Subtasks():
+    """
+    Subtasks give an interface for manage subtasks in Producteev.
+    """
+
     def __init__(self, api):
         self.__api = api
 
     def new(self, task, title):
         from tasks import Task
         if isinstance(task, int):
-            subtask = self.__api.call('subtasks/create.json', id_task=task,
+            subtask = self.__api.call('subtasks/create', id_task=task,
                                    title=title)['subtask']
         elif isinstance(task, Task):
-            subtask = self.__api.call('subtasks/create.json', id_task=task.id,
+            subtask = self.__api.call('subtasks/create', id_task=task.id,
                                    title=title)['subtask']
         else:
             subtask = None

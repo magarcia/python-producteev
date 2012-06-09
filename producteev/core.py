@@ -7,7 +7,6 @@ from hashlib import md5
 from urllib import urlencode
 import urllib2
 import json
-import logging
 from datetime import datetime
 
 from users import Users
@@ -17,9 +16,6 @@ from tasks import Tasks
 from dashboards import Dashboards
 from subtasks import Subtasks
 
-
-#: Logger for core module
-LOGGER = logging.getLogger('producteev.core')
 
 PRODUCTEEV_DATE_FORMAT = "%a, %d %b %Y %H:%M:%S"
 
@@ -44,14 +40,12 @@ class AuthError(ProducteevError):
         super(AuthError, self).__init__('Authentication Error', message, response)
 
 
-class Producteev(object):
+class Producteev():
     """
     """
     BASE_URL = "https://api.producteev.com/"
 
     def __init__(self, api_key, secret):
-        """
-        """
         self.api_key = api_key
         self.secret = secret
         self.user = None
@@ -73,7 +67,7 @@ class Producteev(object):
         Compose url from path and params.
         """
         params = self.__sign_params(params)
-        return "%s%s?%s" % (self.BASE_URL, path, urlencode(params))
+        return "%s%s?%s" % (self.BASE_URL, '%s.json' % path, urlencode(params))
 
     def __handle_response(self, response):
         """
@@ -82,6 +76,9 @@ class Producteev(object):
         return json.loads(response.read())
 
     def __request(self, path, **params):
+        """
+        Make request to Producteev API
+        """
         for k, v in params.items():
             params[k] = str(v)
         url = self.__compose_url(path, params)
@@ -89,6 +86,15 @@ class Producteev(object):
         return self.__handle_response(r)
 
     def call(self, path, **params):
+        """
+        Call to a Producteev API method, with any path of here_ and the required
+        param for the method.
+
+        Example:
+            call('users/view', id_colleague=1234)
+
+        .. _here: http://code.google.com/p/producteev-api/wiki/methodsDescriptions#Summary
+        """
         if not self.token:
             raise AuthError('Token undefined, login required')
         return self.__request(path, token=self.token, **params)
@@ -97,18 +103,17 @@ class Producteev(object):
         """
         Get time from Producteev server.
         """
-        time = self.call('time.json')['time']['value']
-        LOGGER.debug(time)
+        time = self.call('time')['time']['value']
         return datetime.strptime(
             ' '.join(time.split(' ')[0:-1]),
             PRODUCTEEV_DATE_FORMAT)
 
     def login(self, email, password):
         """
-        Login user to API.
+        Login user to Producteev.
         """
         response = self.__request(
-                        'users/login.json',
+                        'users/login',
                         email=email,
                         password=password)
         self.token = response['login']['token']
@@ -118,4 +123,3 @@ class Producteev(object):
         self.labels = Labels(self)
         self.activities = Activities(self)
         self.subtasks = Subtasks(self)
-        LOGGER.debug('Loged')

@@ -2,11 +2,9 @@
 #
 # This file is part of python-producteev, and is made available under
 # MIT license. See LICENSE for the full details.
-import logging
 from utils import unescape
 
 STATUS = ('UNDONE', 'DONE')
-
 
 # TODO:
 # tasks/note_view
@@ -17,10 +15,11 @@ STATUS = ('UNDONE', 'DONE')
 # tasks/activities_get
 # tasks/subtasks
 
-LOGGER = logging.getLogger('producteev.tasks')
 
-
-class Task(object):
+class Task():
+    """
+    Task represents an task entity in Producteev.
+    """
 
     class __raw:
             pass
@@ -42,7 +41,7 @@ class Task(object):
             return unescape(self.__raw.title)
 
         def fset(self, value):
-            task = self.__api.call('tasks/set_title.json', id_task=self.id,
+            task = self.__api.call('tasks/set_title', id_task=self.id,
                                    title=value)['task']
             self.__reload(task)
 
@@ -55,19 +54,19 @@ class Task(object):
 
         def fset(self, value):
             if isinstance(value, int):
-                task = self.__api.call('tasks/set_status.json',
+                task = self.__api.call('tasks/set_status',
                                         id_task=self.id,
                                         status=value)['task']
             elif isinstance(value, str):
                 try:
                     value = int(value)
-                    task = self.__api.call('tasks/set_status.json',
+                    task = self.__api.call('tasks/set_status',
                                             id_task=self.id,
                                             status=value)['task']
                 except:
                     try:
                         value = STATUS.index(value.upper()) + 1
-                        task = self.__api.call('tasks/set_status.json',
+                        task = self.__api.call('tasks/set_status',
                                                 id_task=self.id,
                                                 status=value)['task']
                     except:
@@ -82,7 +81,7 @@ class Task(object):
             return self.__raw.star
 
         def fset(self, value):
-            task = self.__api.call('tasks/set_star.json', id_task=self.id,
+            task = self.__api.call('tasks/set_star', id_task=self.id,
                                     star=value)['task']
             self.__reload(task)
         return locals()
@@ -96,15 +95,15 @@ class Task(object):
         def fset(self, value):
             from users import User
             if isinstance(value, int):
-                task = self.__api.call('tasks/set_responsible.json',
+                task = self.__api.call('tasks/set_responsible',
                                        id_task=self.id,
                                        id_responsible=value)['task']
             elif isinstance(value, User):
-                task = self.__api.call('tasks/set_responsible.json',
+                task = self.__api.call('tasks/set_responsible',
                                        id_task=self.id,
                                        id_responsible=value.id)['task']
             elif value is None:
-                task = self.__api.call('tasks/unset_responsible.json',
+                task = self.__api.call('tasks/unset_responsible',
                                        id_task=self.id)['task']
             self.__reload(task)
         return locals()
@@ -123,11 +122,11 @@ class Task(object):
 
         def fset(self, value):
             if value:
-                task = self.__api.call('tasks/set_deadline.json',
+                task = self.__api.call('tasks/set_deadline',
                                        id_task=self.id,
                                        deadline=value)['task']
             else:
-                task = self.__api.call('tasks/unset_deadline.json',
+                task = self.__api.call('tasks/unset_deadline',
                                        id_task=self.id)['task']
             self.__reload(task)
         return locals()
@@ -139,10 +138,10 @@ class Task(object):
 
         def fset(self, value):
             if value:
-                task = self.__api.call('tasks/set_reminder.json',
+                task = self.__api.call('tasks/set_reminder',
                                         id_task=self.id, reminder=value)['task']
             else:
-                task = self.__api.call('tasks/set_reminder.json',
+                task = self.__api.call('tasks/set_reminder',
                                         id_task=self.id, reminder=0)['task']
             self.__reload(task)
 
@@ -155,19 +154,19 @@ class Task(object):
 
         def fset(self, value, interval=1):
             if value:
-                task = self.__api.call('tasks/set_repeating.json',
+                task = self.__api.call('tasks/set_repeating',
                                        id_task=self.id,
                                        repeating_interval=interval,
                                        repeating_value=value)['task']
             else:
-                task = self.__api.call('tasks/unset_repeating.json',
+                task = self.__api.call('tasks/unset_repeating',
                                        id_task=self.id)['task']
             self.__reload(task)
         return locals()
     repeating = property(**__set_repeating())
 
     def delete(self):
-        return self.__api.call('tasks/delete.json', id_task=self.id)
+        return self.__api.call('tasks/delete', id_task=self.id)
 
     def __set_labels():
         def fget(self):
@@ -187,11 +186,11 @@ class Task(object):
         def fset(self, value):
             from dashboards import Dashboard
             if isinstance(value, int):
-                task = self.__api.call('tasks/set_workspace.json',
+                task = self.__api.call('tasks/set_workspace',
                                         id_task=self.id,
                                         id_dashboard=value)['task']
             elif isinstance(value, Dashboard):
-                task = self.__api.call('tasks/set_workspace.json',
+                task = self.__api.call('tasks/set_workspace',
                                         id_task=self.id,
                                         id_dashboard=value.id)['task']
             else:
@@ -215,38 +214,42 @@ class Task(object):
     subtasks = property(**__get_subtasks())
 
 
-class Tasks(object):
+class Tasks():
+    """
+    Tasks give an interface for manage tasks in Producteev.
+    """
+
     def __init__(self, api):
         self.__api = api
 
     def new(self, title, **kwargs):
         """
         """
-        return Task(self.__api, self.__api.call('tasks/create.json', title=title,
+        return Task(self.__api, self.__api.call('tasks/create', title=title,
                                    **kwargs)['task'])
 
     def get(self, id_task, **kwargs):
         """
         """
-        return Task(self.__api, self.__api.call('tasks/view.json', id_task=id_task,
+        return Task(self.__api, self.__api.call('tasks/view', id_task=id_task,
                              **kwargs)['task'])
 
     def list(self, **kwargs):
         """
         """
-        tasks = self.__api.call('tasks/my_tasks.json', **kwargs)['tasks']
+        tasks = self.__api.call('tasks/my_tasks', **kwargs)['tasks']
         return [Task(self.__api, x['task']) for x in tasks]
 
     def list_all(self, **kwargs):
         """
         """
-        tasks = self.__api.call('tasks/show_list.json', **kwargs)['tasks']
+        tasks = self.__api.call('tasks/show_list', **kwargs)['tasks']
         return [Task(self.__api, x['task']) for x in tasks]
 
     def archived(self, **kwargs):
-        tasks = self.__api.call('tasks/archived.json', **kwargs)['tasks']
+        tasks = self.__api.call('tasks/archived', **kwargs)['tasks']
         return [Task(self.__api, x['task']) for x in tasks]
 
     def list_team(self, **kwargs):
-        tasks = self.__api.call('tasks/my_team_tasks.json', **kwargs)['tasks']
+        tasks = self.__api.call('tasks/my_team_tasks', **kwargs)['tasks']
         return [Task(self.__api, x['task']) for x in tasks]

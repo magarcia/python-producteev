@@ -4,13 +4,13 @@
 # This file is part of python-producteev, and is made available under
 # MIT license. See LICENSE for the full details.
 
-import __version
 from .core import Producteev, AuthError
 from .timezones import Zones as TimeZones
 
-VERSION = __version.tuple
+VERSION = (0, 1, 3)
 
 __author__ = "Martin Garcia"
 __contact__ = "newluxfero@gmail.com"
 __homepage__ = "http://github.com/magarcia/python-producteev"
-__version__ = __version.dotted
+__version__ = '.'.join([str(i) for i in VERSION])
+__release__ = 'beta'
