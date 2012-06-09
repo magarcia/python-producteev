@@ -14,12 +14,11 @@ class Activity():
 
     def __init__(self, api, values):
         self.__api = api
-        self.__raw.__dict__.update(values)
-        self.id = self.__raw.id_activity
+        self.__reload(values)
 
     def __reload(self, values):
         self.__raw.__dict__.update(values)
-        self.id = self.__raw.id_activity
+        self.id = int(self.__raw.id_activity)
 
     def set_read(self):
         """

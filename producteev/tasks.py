@@ -17,15 +17,17 @@ class Task():
 
     def __init__(self, api, values):
         self.__api = api
-        self.__raw.__dict__.update(values)
-        self.id = self.__raw.id_task
+        self.__reload(values)
 
     def __reload(self, values):
         self.__raw.__dict__.update(values)
-        self.id = self.__raw.id_task
+        self.id = int(self.__raw.id_task)
 
     def __str__(self):
         return self.title
+
+    def __cmp__(self, other):
+        return self.id - other.id
 
     def __set_title():
         def fget(self):

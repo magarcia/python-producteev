@@ -25,20 +25,19 @@ class User():
 
     def __get_user_info(self, id):
         if isinstance(id, int):
-            self.__raw.__dict__.update(self.__api.call('users/view',
-                                id_colleague=id)['user'])
+            values = self.__api.call('users/view', id_colleague=id)['user']
         else:
-            self.__raw.__dict__.update(self.__api.call('users/view')['user'])
+            values = self.__api.call('users/view')['user']
+        self.__reload(values)
+
+    def __reload(self, values):
+        self.__raw.__dict__.update(values)
         self.firstname = unescape(self.__raw.firstname)
         self.lastname = unescape(self.__raw.lastname)
         self.company = unescape(self.__raw.company)
         self.colleagues = self.__raw.colleagues
-        self.id = self.__raw.id_user
+        self.id = int(self.__raw.id_user)
         self.lang = LANG_ID[int(self.__raw.lang) + 1]
-
-    def __reload(self, values):
-        self.__raw.__dict__.update(values)
-        self.id = self.__raw.id_user
 
     def __full_name():
         def fget(self):
