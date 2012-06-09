@@ -6,15 +6,6 @@ from utils import unescape
 
 STATUS = ('UNDONE', 'DONE')
 
-# TODO:
-# tasks/note_view
-# tasks/notes_get
-# tasks/note_create
-# tasks/note_delete
-# tasks/activity_view
-# tasks/activities_get
-# tasks/subtasks
-
 
 class Task():
     """
@@ -200,8 +191,38 @@ class Task():
         return locals()
     dashboard = property(**__set_workspace())
 
-    # TODO: Add support for notes
-    # TODO: Add support for activities
+    def __notes():
+        """
+        Get every note of a task.
+        """
+        def fget(self):
+            task = self.__api.call('tasks/notes_get', id_task=self.id)
+            return task
+
+        def fset(self):
+            pass
+    notes = property(**__notes())
+
+    def new_note(self, message):
+        """
+        Create a note attached to a task.
+        """
+        return self.__api.call('tasks/note_create', id_task=self.id,
+                                message=message)
+
+    def __activities():
+        """
+        Get every note of a task.
+        """
+        def fget(self):
+            from activities import Activity
+            activities = self.__api.call('tasks/activities_get',
+                                         id_task=self.id)['activities']
+            return [Activity(self.__api, x['activity']) for x in activities]
+
+        def fset(self):
+            pass
+    activities = property(**__activities())
 
     def __get_subtasks():
         def fget(self):
@@ -253,3 +274,15 @@ class Tasks():
     def list_team(self, **kwargs):
         tasks = self.__api.call('tasks/my_team_tasks', **kwargs)['tasks']
         return [Task(self.__api, x['task']) for x in tasks]
+
+    def get_note(self, id_note):
+        """
+        Get a note.
+        """
+        return self.__api.call('tasks/note_view', id_note=id_note)
+
+    def delete_note(self, id_note):
+        """
+        Deleta a note.
+        """
+        return self.__api.call('tasks/note_delete', id_note=id_note)

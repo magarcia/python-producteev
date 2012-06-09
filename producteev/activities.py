@@ -52,6 +52,13 @@ class Activities():
         return locals()
     list = property(**__list())
 
+    def get(self, id_activity):
+        """
+        Get activity.
+        """
+        activity = self.__api.call('tasks/activity_view')['activity']
+        return Activity(self.__api, activity)
+
     def __notifications():
         """
         Get every notifications (notifications are activities that current user
