@@ -36,3 +36,6 @@ _trial_temp
 # SublimeText
 *.sublime-project
 *.sublime-workspace
+
+# Docs
+docs/_*
