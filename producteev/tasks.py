@@ -201,6 +201,7 @@ class Task():
 
         def fset(self):
             pass
+        return locals()
     notes = property(**__notes())
 
     def new_note(self, message):
@@ -222,6 +223,7 @@ class Task():
 
         def fset(self):
             pass
+        return locals()
     activities = property(**__activities())
 
     def __get_subtasks():
