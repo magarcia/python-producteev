@@ -17,13 +17,21 @@ if sys.argv[-1] == 'publish':
 
 required = []
 
+
+def read(fname):
+    try:
+        return open(os.path.join(os.path.dirname(__file__), fname)).read()
+    except:
+        return "This is a Python wrapper for the Producteev API."
+
+
 setup(
     name='producteev',
     version=producteev.__version__,
     description='Producteev API.',
-    long_description=open('README.rst').read(),
     author='Martín García',
     author_email='newluxfero@gmail.com',
+    long_description = read('README.rst'),
     url='https://github.com/magarcia/python-producteev',
     packages=['producteev'],
     package_data={'': ['LICENSE',]},
