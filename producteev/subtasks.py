@@ -24,6 +24,9 @@ class Subtask():
     def __str__(self):
         return self.title
 
+    def __cmp__(self, other):
+        return self.id - other.id
+
     def __title():
         def fget(self):
             return unescape(self.__raw.title)
@@ -49,7 +52,9 @@ class Subtask():
     position = property(**__position())
 
     def delete(self):
-        return self.__api.call('subtasks/delete', id_subtask=self.id)
+        resp = self.__api.call('subtasks/delete',
+                               id_subtask=self.id)['stats']['result']
+        return resp == 'TRUE'
 
 
 class Subtasks():
@@ -63,12 +68,20 @@ class Subtasks():
     def new(self, task, title):
         from tasks import Task
         if isinstance(task, int):
-            subtask = self.__api.call('subtasks/create', id_task=task,
-                                   title=title)['subtask']
+            pass
         elif isinstance(task, Task):
-            subtask = self.__api.call('subtasks/create', id_task=task.id,
-                                   title=title)['subtask']
+            task = task.id
+        elif isinstance(task, str):
+            try:
+                task = int(task)
+            except:
+                # TODO: raise error
+                return None
         else:
-            subtask = None
+            # TODO: raise error
+            return None
+
+        subtask = self.__api.call('subtasks/create', id_task=task,
+                                   title=title)['subtask']
 
         return Subtask(self.__api, subtask)

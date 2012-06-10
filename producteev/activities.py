@@ -20,6 +20,9 @@ class Activity():
         self.__raw.__dict__.update(values)
         self.id = int(self.__raw.id_activity)
 
+    def __cmp__(self, other):
+        return self.id - other.id
+
     def set_read(self):
         """
         Set activity status as read.

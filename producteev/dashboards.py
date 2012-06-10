@@ -25,6 +25,9 @@ class Dashboard():
     def __str__(self):
         return self.title
 
+    def __cmp__(self, other):
+        return self.id - other.id
+
     def __title():
         def fget(self):
             return unescape(self.__raw.title)
@@ -84,7 +87,9 @@ class Dashboard():
             self.disable_smart_labels()
 
     def delete(self):
-        return self.__api.call('dashboards/delete', id_dashboard=self.id)
+        resp = self.__api.call('dashboards/delete',
+                                id_dashboard=self.id)['stats']['result']
+        return resp == 'TRUE'
 
     def invite(self, value, message=None):
         from users import User
@@ -131,15 +136,22 @@ class Dashboards():
 
     def get(self, value):
         if isinstance(value, int):
-            dashboard = Dashboard(self.__api,
+            pass
+        elif isinstance(value, Dashboard):
+            value = value.id
+        elif isinstance(value, str):
+            try:
+                value = int(str)
+            except:
+                # TODO: raise error
+                return None
+        else:
+            # TODO: raise error
+            return None
+
+        dashboard = Dashboard(self.__api,
                                 self.__api.call('dashboards/view',
                                 id_dashboard=value)['dashboard'])
-        elif isinstance(value, Dashboard):
-            dashboard = Dashboard(self.__api,
-                                self.__api.call('dashboards/view',
-                                id_dashboard=value.id)['dashboard'])
-        else:
-            dashboard = None
         return dashboard
 
     def __list():

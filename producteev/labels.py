@@ -24,6 +24,9 @@ class Label():
     def __str__(self):
         return self.title
 
+    def __cmp__(self, other):
+        return self.id - other.id
+
     def __set_title():
         def fget(self):
             return unescape(self.__raw.title)
@@ -48,7 +51,9 @@ class Label():
     tasks = property(**__tasks())
 
     def delete(self):
-        return self.__api.call('labels/delete', id_label=self.id)
+        resp = self.__api.call('labels/delete',
+                                id_label=self.id)['stats']['result']
+        return resp == 'TRUE'
 
 
 class Labels():
@@ -64,6 +69,19 @@ class Labels():
                             title=title, id_dashboard=id_dashboard)['label'])
 
     def get(self, id_label):
+        if isinstance(id_label, int):
+            pass
+        elif isinstance(id_label, Label):
+            id_label = id_label.id
+        elif isinstance(id_label, str):
+            try:
+                id_label = int(id_label)
+            except:
+                # TODO: raise error
+                return None
+        else:
+            # TODO: raise error
+            return None
         return Label(self.__api, self.__api.call('labels/view',
                         id_label=id_label)['label'])
 

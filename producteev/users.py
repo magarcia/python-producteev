@@ -30,6 +30,9 @@ class User():
             values = self.__api.call('users/view')['user']
         self.__reload(values)
 
+    def __cmp__(self, other):
+        return self.id - other.id
+
     def __reload(self, values):
         self.__raw.__dict__.update(values)
         self.firstname = unescape(self.__raw.firstname)

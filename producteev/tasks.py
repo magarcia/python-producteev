@@ -159,7 +159,9 @@ class Task():
     repeating = property(**__set_repeating())
 
     def delete(self):
-        return self.__api.call('tasks/delete', id_task=self.id)
+        resp = self.__api.call('tasks/delete',
+                               id_task=self.id)['stats']['result']
+        return resp == 'TRUE'
 
     def __set_labels():
         def fget(self):
@@ -231,7 +233,9 @@ class Task():
     def __get_subtasks():
         def fget(self):
             from subtasks import Subtask
-            return [Subtask(self.__api, x) for x in self.__raw.subtasks]
+            subtasks = self.__api.call('tasks/subtasks',
+                                        id_task=self.id)['subtasks']
+            return [Subtask(self.__api, x) for x in subtasks]
 
         def fset(self, value):
             pass
@@ -256,6 +260,20 @@ class Tasks():
     def get(self, id_task, **kwargs):
         """
         """
+        if isinstance(id_task, int):
+            pass
+        elif isinstance(id_task, Task):
+            id_task = id_task.id
+        elif isinstance(id_task, str):
+            try:
+                id_task = int(id_task)
+            except:
+                # TODO: raise error
+                return None
+        else:
+            # TODO: raise error
+            return None
+
         return Task(self.__api, self.__api.call('tasks/view', id_task=id_task,
                              **kwargs)['task'])
 
