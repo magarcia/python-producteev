@@ -4,7 +4,7 @@
 # MIT license. See LICENSE for the full details.
 
 
-class Activity():
+class Activity(object):
     """
     Activity represents an activity entity in Producteev.
     """
@@ -32,7 +32,7 @@ class Activity():
         return [Activity(self.__api, x['activity']) for x in activities]
 
 
-class Activities():
+class Activities(object):
     """
     Activities give an interface for manage activities in Producteev.
     """
@@ -58,6 +58,20 @@ class Activities():
         """
         Get activity.
         """
+        if isinstance(id_activity, int):
+            pass
+        elif isinstance(id_activity, Activity):
+            id_activity = id_activity.id
+        elif isinstance(id_activity, str):
+            try:
+                id_activity = int(id_activity)
+            except:
+                # TODO: raise error
+                return None
+        else:
+            # TODO: raise error
+            return None
+
         activity = self.__api.call('tasks/activity_view')['activity']
         return Activity(self.__api, activity)
 
@@ -71,6 +85,7 @@ class Activities():
             return [Activity(self.__api, x['activity']) for x in activities]
 
         def fset(self):
+            # TODO: raise inmutable object
             pass
 
         return locals()
@@ -80,6 +95,35 @@ class Activities():
         """
         Set notifications status as read.
         """
+        from dashboards import Dashboard
+        if isinstance(id_dashboard, int):
+            pass
+        elif isinstance(id_dashboard, Dashboard):
+            id_dashboard = id_dashboard.id
+        elif isinstance(id_dashboard, str):
+            try:
+                id_dashboard = int(id_dashboard)
+            except:
+                # TODO: raise error
+                return None
+        else:
+            # TODO: raise error
+            return None
+
+        if isinstance(last_id, int):
+            pass
+        elif isinstance(last_id, Activity):
+            last_id = last_id.id
+        elif isinstance(last_id, str):
+            try:
+                last_id = int(last_id)
+            except:
+                # TODO: raise error
+                return None
+        else:
+            # TODO: raise error
+            return None
+
         activities = self.__api.call('activities/notifications_set_read',
                                      id_dashboard=id_dashboard,
                                      last_id=last_id)['activities']

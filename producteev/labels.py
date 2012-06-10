@@ -5,7 +5,7 @@
 from utils import unescape
 
 
-class Label():
+class Label(object):
     """
     Label represents an label entity in Producteev.
     """
@@ -56,7 +56,7 @@ class Label():
         return resp == 'TRUE'
 
 
-class Labels():
+class Labels(object):
     """
     Labels give an interface for manage labels in Producteev.
     """

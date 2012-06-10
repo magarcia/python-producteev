@@ -7,7 +7,7 @@ from utils import unescape
 STATUS = ('UNDONE', 'DONE')
 
 
-class Task():
+class Task(object):
     """
     Task represents an task entity in Producteev.
     """
@@ -243,7 +243,7 @@ class Task():
     subtasks = property(**__get_subtasks())
 
 
-class Tasks():
+class Tasks(object):
     """
     Tasks give an interface for manage tasks in Producteev.
     """
@@ -307,4 +307,6 @@ class Tasks():
         """
         Deleta a note.
         """
-        return self.__api.call('tasks/note_delete', id_note=id_note)
+        resp = self.__api.call('tasks/note_delete',
+                                id_note=id_note)['stats']['result']
+        return resp == 'TRUE'

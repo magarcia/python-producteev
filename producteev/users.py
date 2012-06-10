@@ -11,7 +11,7 @@ SORT_BY = ('deadline', 'manager', 'labels', 'time_lastchange',
            'workspace', 'priority', 'title', 'time_created')
 
 
-class User():
+class User(object):
     """
     User represents an user entity in Producteev.
     """
@@ -62,15 +62,22 @@ class User():
             from dashboards import Dashboard
 
             if isinstance(value, int):
+                pass
+            elif isinstance(value, Dashboard):
+                value = value.id
+            elif isinstance(value, str):
+                try:
+                    value = int(value)
+                except:
+                    # TODO: raise error
+                    value = None
+            else:
+                # TODO: raise error
+                value = None
+
+            if not value is None:
                 user = self.__api.call('users/set_default_dashboard',
                                         id_dashboard=value)['user']
-            elif isinstance(value, Dashboard):
-                user = self.__api.call('users/set_default_dashboard',
-                                        id_dashboard=value.id)['user']
-            else:
-                user = None
-
-            if not user:
                 self.__reload(user)
 
         return locals()
@@ -82,24 +89,23 @@ class User():
 
         def fset(self, value):
             if isinstance(value, int):
-                user = self.__api.call('users/set_sort_by',
-                                       sort=value)['user']
+                value += 1
             elif isinstance(value, str):
                 try:
-                    value = int(value)
-                    user = self.__api.call('users/set_sort_by',
-                                       sort=value)['user']
+                    value = int(value) + 1
                 except:
                     try:
                         value = SORT_BY.index(value.lower()) + 1
-                        user = self.__api.call('users/set_sort_by',
-                                       sort=value)['user']
                     except:
-                        user = None
+                        # TODO: raise error
+                        value = None
             else:
-                user = None
+                # TODO: raise error
+                value = None
 
-            if not user is None:
+            if not value is None:
+                user = self.__api.call('users/set_sort_by',
+                                       sort=value)['user']
                 self.__reload(user)
 
         return locals()
@@ -118,7 +124,7 @@ class User():
     timezone = property(**__timezone())
 
 
-class Users():
+class Users(object):
     """
     Users give an interface for manage users in Producteev.
     """
@@ -138,4 +144,17 @@ class Users():
     list = property(**__list())
 
     def get(self, id):
+        if isinstance(id, int):
+            pass
+        elif isinstance(id, User):
+            id = id.id
+        elif isinstance(id, str):
+            try:
+                id = int(id)
+            except:
+                # TODO: raise error
+                return None
+        else:
+            # TODO: raise error
+            return None
         return User(self.__api, id)

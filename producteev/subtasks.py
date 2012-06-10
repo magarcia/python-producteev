@@ -5,7 +5,7 @@
 from utils import unescape
 
 
-class Subtask():
+class Subtask(object):
     """
     Subtask represents an subtask entity in Producteev.
     """
@@ -57,7 +57,7 @@ class Subtask():
         return resp == 'TRUE'
 
 
-class Subtasks():
+class Subtasks(object):
     """
     Subtasks give an interface for manage subtasks in Producteev.
     """

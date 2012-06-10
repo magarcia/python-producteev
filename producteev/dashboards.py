@@ -6,7 +6,7 @@ from utils import unescape
 import re
 
 
-class Dashboard():
+class Dashboard(object):
     """
     Dashboard represents an dashboard entity in Producteev.
     """
@@ -68,7 +68,9 @@ class Dashboard():
     tasks = property(**__tasks())
 
     def leave(self):
-        return self.__api.call('dashboards/leave', id_dashboard=self.id)
+        resp = self.__api.call('dashboards/leave',
+                                id_dashboard=self.id)['stats']['result']
+        return resp == 'TRUE'
 
     def enable_smart_labels(self):
         dashboard = self.__api.call('dashboards/leave',
@@ -122,7 +124,7 @@ class Dashboard():
                                      id_dashboard=self.id)
 
 
-class Dashboards():
+class Dashboards(object):
     """
     Dashboards give an interface for manage dashboards in Producteev.
     """
@@ -205,9 +207,9 @@ class Dashboards():
             # TODO: Raise error
             return None
 
-        dashboards = self.__api.call('dashboards/refuse',
-                                     id_dashboard=id_dashboard)
-        return dashboards
+        resp = self.__api.call('dashboards/refuse',
+                                id_dashboard=id_dashboard)['stats']['result']
+        return resp == 'TRUE'
 
     def need_upgrade(self):
         """
