@@ -7,7 +7,7 @@
 from .core import Producteev, AuthError
 from .timezones import Zones as TimeZones
 
-VERSION = (0, 1, 3)
+VERSION = (0, 1, 4)
 
 __author__ = "Martin Garcia"
 __contact__ = "newluxfero@gmail.com"

@@ -11,10 +11,13 @@ To install producteev, simply::
 
     $ pip install producteev
 
-Or, if you absolutely must::
+Or::
 
     $ easy_install producteev
 
+Or, if you absolutely must::
+
+    $ sudo python setup.py install
 
 
 Usage
@@ -43,6 +46,29 @@ Get as list of tasks::
 Get as list of lables::
 
     client.labels.list
+
+
+Tests
+-----
+
+For run tests::
+
+    $ python setup.py test
+
+This option ask you about your API_KEY, SECRET_KEY, Username and Password for
+run tests with your account (after testing, your account will remain as before).
+If you don't want write this info on each test, you can add it in tests.cfg
+
+
+Docs
+----
+
+For build docs::
+
+    $ python setup.py docs [format]
+
+Available formats: ``html`` (default), ``pdf``, ``latex``
+
 
 License
 -------
