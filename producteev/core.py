@@ -5,8 +5,7 @@
 
 from hashlib import md5
 from urllib import urlencode
-import urllib2
-import json
+import requests
 from datetime import datetime
 
 from users import Users
@@ -69,12 +68,6 @@ class Producteev():
         params = self.__sign_params(params)
         return "%s%s?%s" % (self.BASE_URL, '%s.json' % path, urlencode(params))
 
-    def __handle_response(self, response):
-        """
-        Load response to python dictonary.
-        """
-        return json.loads(response.read())
-
     def __request(self, path, **params):
         """
         Make request to Producteev API
@@ -82,8 +75,9 @@ class Producteev():
         for k, v in params.items():
             params[k] = str(v)
         url = self.__compose_url(path, params)
-        r = urllib2.urlopen(url)
-        return self.__handle_response(r)
+        # r = urllib2.urlopen(url)
+        # return self.__handle_response(r)
+        return requests.get(url).json
 
     def call(self, path, **params):
         """
